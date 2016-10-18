@@ -400,10 +400,6 @@ export condp
     p = condp(r, DistributionIndices=[3, 1]);
 
 **`p`** is now an array of the same size as **`r`**, but with **`sum(sum(p,3),1) = 1`** for each of the dimensions of the 2nd index.
-
-*Note:*
-
-**`p=condp(r,0)`** returns a normalised array **`p = r./sum(r(:))`**
 """ ->
 function condp(p; DistributionIndices::IntOrIntArray=[]) ## FIXME! This doesn't work when p is more than an 2D array
     p=p+realmin(); # in case all unnormalised probabilities are zero
@@ -413,7 +409,8 @@ function condp(p; DistributionIndices::IntOrIntArray=[]) ## FIXME! This doesn't 
         return p
     else
     if DistributionIndices==0
-        p=p./sum(p[:])
+        #p=p./sum(p[:])
+        p=p./sum(p)
         return p
     end
         allvars=1:length(size(p))
@@ -426,6 +423,32 @@ function condp(p; DistributionIndices::IntOrIntArray=[]) ## FIXME! This doesn't 
         pnew=ipermutedims(pnew,vcat(DistributionIndices,condvars))
         return pnew
     end
+end
+
+
+export normp
+@doc """
+ Creates a normalised array from an array
+
+    pnew = normp(pin)
+
+##### Input:
+* `pin`:      an array
+
+
+##### Output:
+* `pnew`:    a new array with **`sum(pnew) =1`**
+
+##### Example:
+    r = rand(4, 2, 3);
+    p = normp(r);
+
+**`p`** is now an array of the same size as **`r`**, but with **`sum(p) = 1`**
+""" ->
+function normp(p) ## FIXME! This doesn't work when p is more than an 2D array
+    p=p+realmin(); # in case all unnormalised probabilities are zero
+    p=p./sum(p)
+    return p
 end
 
 
